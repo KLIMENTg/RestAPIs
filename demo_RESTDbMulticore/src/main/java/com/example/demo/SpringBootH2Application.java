@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import javax.json.*;
+
 @RestController // related to RequestMapping
 
 @RequestMapping("/api")
@@ -43,8 +45,6 @@ public class SpringBootH2Application {
 	final int PAUSED = 3;
 	final int FINISHED = 4;
 	final int CANCELLED = 5;
-	
-	
 	
 	@PostMapping("/orders")
 	String newOrder(@RequestBody PostRequestBody body) {
@@ -217,7 +217,28 @@ public class SpringBootH2Application {
         List<SushiOrder> orders = jdbcTemplate.query( sql, new SushiOrderRowMapper() );
 	    System.out.println(orders);
 	    
-	    return orders.toString();
+	    String labels[] = {"in-progress", "created", "paused", "cancelled", "completed"};
+	    int stats[] = {2, 1, 3, 5, 4};
+	    
+	    int count = 0;
+	    JsonArrayBuilder jsonObjInner = Json.createArrayBuilder();
+	    JsonObjectBuilder jsonObjInnerMost = Json.createObjectBuilder();
+	    JsonObjectBuilder jsonObjOuter = Json.createObjectBuilder();
+	    for (int status : stats) {
+	        for (SushiOrder order : orders) {
+	        	if( status == order.getStatus_id() ) {
+	        		
+	        		jsonObjInnerMost.add( "order_Id", String.valueOf( order.getId()) );
+	        		jsonObjInnerMost.add( "time_Left", String.valueOf( order.getTime_left()) );
+	        		jsonObjInner.add( jsonObjInnerMost );
+	        		jsonObjInnerMost = Json.createObjectBuilder();
+	        	}
+	        }
+        	jsonObjOuter.add( labels[count], jsonObjInner.build() );
+        	jsonObjInner = Json.createArrayBuilder();
+	        count++;
+	    }
+	    return jsonObjOuter.build().toString();
 	}
 	
 	@RequestMapping("/")

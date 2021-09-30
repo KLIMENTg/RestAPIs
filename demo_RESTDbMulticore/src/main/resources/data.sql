@@ -11,6 +11,7 @@
             status_id INT NOT NULL,  
             sushi_id INT NOT NULL,
             time_left INT NOT NULL default 0,
+            time_spent INT NOT NULL default 0,
             createdAt TIMESTAMP NOT NULL default CURRENT_TIMESTAMP  
         );  
 

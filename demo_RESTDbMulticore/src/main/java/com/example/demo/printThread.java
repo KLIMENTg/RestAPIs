@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;
+import java.util.List;
 
 @Component
 @Scope("prototype")
@@ -12,11 +13,16 @@ public class printThread extends Thread{
 
 	private float time;
 	private int timeToFinish;
+	private float timeSpent;
+	private float timeLeft;
 	private SushiOrder currentOrder;
 	static volatile Deque<SushiOrder> jobQueue;
 	
 	final int ORDER_IN_PROGRESS = 2;
 	final int ORDER_FINISHED = 4;
+	
+	final int WORK_INTERVAL_MS = 500;
+	final int MILLISECOND = 1000;
 	
     JdbcTemplate jdbcTemplate;
     
@@ -41,12 +47,26 @@ public class printThread extends Thread{
 				// Process order
 				time = 0;
 				timeToFinish = currentOrder.getTime_left();
+				timeSpent = getTotalTimeById( currentOrder.getSushi_id() ) - timeToFinish;
+				timeLeft = getTotalTimeById( currentOrder.getSushi_id() ) - timeSpent;
+				
 				System.out.println(getName() + " is running order: " + currentOrder.getId() + " with time: " + timeToFinish);
 				try {
 					while( true ) {
-						Thread.sleep(500);
+						Thread.sleep(WORK_INTERVAL_MS);
 						time += 0.5;
+						timeSpent += 0.5;
+						timeLeft -= 0.5;
+						//timeLeft = getTotalTimeById( currentOrder.getSushi_id() ) - timeSpent;
 						
+						// Update timeSpent
+					    sql = "UPDATE SUSHI_ORDER SET TIME_SPENT=" + timeSpent + " WHERE ID=" + currentOrder.getId();
+				        jdbcTemplate.update(sql);
+						
+				        // Update timeLeft
+					    sql = "UPDATE SUSHI_ORDER SET TIME_LEFT=" + timeLeft + " WHERE ID=" + currentOrder.getId();
+				        jdbcTemplate.update(sql);
+				        
 						if( DEBUG == 1 ) { 
 							System.out.println(this.getName() + " working with time: " + time );
 						}
@@ -71,6 +91,13 @@ public class printThread extends Thread{
 				}
 			}
 		}
+	}
+	
+	private int getTotalTimeById( int sushi_id ) {
+	    String sql = "SELECT * FROM sushi WHERE id=" + sushi_id;
+        List<Sushi> sushi = jdbcTemplate.query( sql, new SushiRowMapper() );
+        int timeToMakeRoll = sushi.get(0).getTimeToMake();
+        return timeToMakeRoll;
 	}
 
 	public int getTimeToFinish(){

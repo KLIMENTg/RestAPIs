@@ -5,6 +5,7 @@ public class SushiOrder {
 	private int status_id;
 	private int sushi_id;
 	private int time_left;
+	private int time_spent;
 	private String createdAt;
 	
 	public SushiOrder() {
@@ -42,6 +43,12 @@ public class SushiOrder {
 	}
 	public void setTime_left(int time_left) {
 		this.time_left = time_left;
+	}
+	public int getTime_spent() {
+		return time_spent;
+	}
+	public void setTime_spent(int time_spent) {
+		this.time_spent = time_spent;
 	}
 	
 	@Override
