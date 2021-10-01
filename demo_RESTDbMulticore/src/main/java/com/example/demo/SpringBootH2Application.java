@@ -228,8 +228,8 @@ public class SpringBootH2Application {
 	        for (SushiOrder order : orders) {
 	        	if( status == order.getStatus_id() ) {
 	        		
-	        		jsonObjInnerMost.add( "order_Id", String.valueOf( order.getId()) );
-	        		jsonObjInnerMost.add( "time_Left", String.valueOf( order.getTime_left()) );
+	        		jsonObjInnerMost.add( "orderId", String.valueOf( order.getId()) );
+	        		jsonObjInnerMost.add( "timeSpent", String.valueOf( order.getTime_spent() ));
 	        		jsonObjInner.add( jsonObjInnerMost );
 	        		jsonObjInnerMost = Json.createObjectBuilder();
 	        	}
