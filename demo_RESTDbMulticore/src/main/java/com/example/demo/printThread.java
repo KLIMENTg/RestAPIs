@@ -37,9 +37,15 @@ public class printThread extends Thread{
 	public void run() {
 		while( true ) {
 
-			if( !jobQueue.isEmpty() ) {
-				currentOrder = jobQueue.remove();
-				
+			boolean queueMutex = false;
+			synchronized( jobQueue ) {
+				if( !jobQueue.isEmpty() ) {
+					currentOrder = jobQueue.remove();
+					queueMutex = true;
+				}
+			}
+			
+			if( queueMutex ) {
 				// Update Status
 			    String sql = "UPDATE SUSHI_ORDER SET STATUS_ID=" + ORDER_IN_PROGRESS + " WHERE ID=" + currentOrder.getId();
 		        int result = jdbcTemplate.update(sql);

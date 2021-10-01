@@ -267,20 +267,8 @@ public class SpringBootH2Application {
     	chef3.setJDBC( jdbcTemplate );
     	chef3.setOrder(new SushiOrder(-1337));
     	
-    	// Start threads asynchronously not to crash in queue fetch
     	chef1.start();
-    	try {
-			Thread.sleep(250);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
     	chef2.start();
-    	
-    	try {
-			Thread.sleep(750);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
     	chef3.start();
 		
 		return "Hello Crunchify Friends! This is your first SpringBoot Example. Isn't that so Simple?";
