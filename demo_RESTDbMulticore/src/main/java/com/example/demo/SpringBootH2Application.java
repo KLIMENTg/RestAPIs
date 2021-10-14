@@ -100,6 +100,7 @@ public class SpringBootH2Application {
         
         String response;
         int result;
+        // order.size() - check if order_id is actually found
         if( order.size() != 0 && order.get(0).getStatus_id() == CREATED ) {
         	// Set order to cancelled
     	    sql = "UPDATE SUSHI_ORDER SET STATUS_ID=" + CANCELLED + " WHERE ID=" + order_id;
